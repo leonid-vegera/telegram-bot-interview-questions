@@ -1,27 +1,26 @@
 const {getQuestion} = require('./utils/index');
 const { Bot, GrammyError, HttpError, Keyboard, InlineKeyboard } = require('grammy');
+const { getCorrectAnswer } = require('./utils');
 require('dotenv').config();
 
 const bot = new Bot(process.env.BOT_TOKEN_KEY);
 
-const sections = ["HTML", "CSS", "JavaScript", "React", "Vue", "Node"]
+const sections = ["HTML", "CSS", "JavaScript", "React", "Випадкове питання"]
 
 bot.api.setMyCommands([
   { command: "start", description: "Запустити бот" },
   { command: "about", description: "Загальний опис боту" },
-  { command: "help", description: "Показати допоміжний текст" },
-  { command: "settings", description: "Відкрити налаштування" },
+  // { command: "help", description: "Показати допоміжний текст" },
+  // { command: "settings", description: "Відкрити налаштування" },
 ]);
 
 bot.command('start', async (ctx) => {
-  // const startKeyBoard = new Keyboard().(sections.map(section => `.text(${section})`))
   const startKeyBoard = new Keyboard()
     .text("HTML")
-    .text("CSS")
-    .text("JavaScript").row()
-    .text("React")
-    .text("Vue")
-    .text("Node")
+    .text("CSS").row()
+    .text("JavaScript")
+    .text("React").row()
+    .text("Випадкове питання")
     .resized();
   await ctx.reply('Вітаємо в чат-боті фронтенду! 🍻 \nТут ти зможеш перевірити свої знання і вивчити щось новеньке')
   await ctx.reply('Обери тему, яку хочеш перевірити', {
@@ -33,37 +32,49 @@ bot.command('about', async (ctx) => {
   await ctx.reply('Ми допоможемо тобі краще розібратись в основних технологіях ВЕБ-розробки')
 })
 
-// bot.on("message", async (ctx) => {
-//   await ctx.reply('Hi')
-// })
-
 bot.hears(sections, async (ctx) => {
   const topic = ctx.message.text;
-  const question = getQuestion(topic);
+  const { question, questionTopic } = getQuestion(topic);
 
-  const inlineKeyboard = !!question.hasOptions ? (
-    new InlineKeyboard()
-    .text(`${question.options[0].text}`, JSON.stringify({type: ctx.message.text, questionId: 1}))
-    .text(`${question.options[1].text}`, JSON.stringify({type: ctx.message.text, questionId: 1})).row()
-    .text(`${question.options[2].text}`, JSON.stringify({type: ctx.message.text, questionId: 1}))
-    .text(`${question.options[3].text}`, JSON.stringify({type: ctx.message.text, questionId: 1}))
-  ) : (
-    new InlineKeyboard()
-    .text("Дізнатись відповідь", JSON.stringify({type: ctx.message.text, questionId: 1}))
-  );
+  let inlineKeyboard;
+
+  if (!!question.hasOptions) {
+    const buttonRows = question.options.map((option) => [
+      InlineKeyboard.text(
+        option.text,
+        JSON.stringify({
+          questionId: question.id,
+          type: `${questionTopic}-option`,
+          isCorrect: option.isCorrect,
+        })
+      )
+    ])
+    inlineKeyboard = InlineKeyboard.from(buttonRows);
+  } else {
+    inlineKeyboard = new InlineKeyboard()
+      .text("Дізнатись відповідь", JSON.stringify({type: questionTopic, questionId: question.id}));
+  }
 
   await ctx.reply(`${question.text}`,
     {reply_markup: inlineKeyboard})
 })
 
 bot.on('callback_query:data', async (ctx) => {
-  if (ctx.callbackQuery.data === 'Cancel') {
-    await ctx.reply('Відміна!')
-    await ctx.answerCallbackQuery()
+  const callbackData = JSON.parse(ctx.callbackQuery.data);
+
+  if (!callbackData.type.endsWith('option')) {
+    const { questionId, type } = callbackData;
+    const answer = getCorrectAnswer(questionId, type);
+    await ctx.reply(answer, {
+      parse_mode: "HTML",
+    });
+    await ctx.answerCallbackQuery();
     return;
   }
-  const callbackData = JSON.parse(ctx.callbackQuery.data);
-  await ctx.reply(`${callbackData.type} - це складова частина Фронтенду`);
+  const normalizedType = callbackData.type.split('-')[0];
+  const correctAnswer = getCorrectAnswer(callbackData.questionId, normalizedType);
+  const showResult = callbackData.isCorrect ? 'Вірно!✅' : `Не вірно!⛔\nВірна відповідь: ${correctAnswer}`;
+  await ctx.reply(showResult);
   await ctx.answerCallbackQuery();
 })
 
