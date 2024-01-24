@@ -3,12 +3,12 @@ const { Bot, GrammyError, HttpError, Keyboard, InlineKeyboard } = require('gramm
 const { getCorrectAnswer } = require('./utils');
 require('dotenv').config();
 
-const webhookURL = 'https://telegram-bot-interview-questions.vercel.app';
+// const webhookURL = 'https://telegram-bot-interview-questions.vercel.app'; // this is for Vercel
 const bot = new Bot(process.env.BOT_TOKEN_KEY);
 
 const sections = ["HTML", "CSS", "JavaScript", "React", "Випадкове питання"]
 
-bot.api.setWebhook(`${webhookURL}/bot${process.env.BOT_TOKEN_KEY}`);
+// bot.api.setWebhook(`${webhookURL}/bot${process.env.BOT_TOKEN_KEY}`);  // this is for Vercel
 bot.api.setMyCommands([
   { command: "start", description: "Запустити бот" },
   { command: "about", description: "Загальний опис боту" },
