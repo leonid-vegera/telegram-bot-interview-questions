@@ -1264,7 +1264,29 @@
         { "id": 1, "text": "Використати метод unique()", "isCorrect": false },
         { "id": 2, "text": "Використати метод removeDuplicates()", "isCorrect": false },
         { "id": 3, "text": "Використати метод distinct()", "isCorrect": false },
-        { "id": 4, "text": "Використати arr.filter((value, index, self) => self.indexOf(value) === index) або [... new Set(arr)]", "isCorrect": true }
+        { "id": 4, "text": "Використати arr.filter((value, index, self) => \nself.indexOf(value) === index) або [... new Set(arr)]", "isCorrect": true }
+      ]
+    },
+    {
+      "id": 95,
+      "text": "Яка буде вірна відповідь?\n\nvar numb = 1;\n\nfunction run() {\n  if (!numb) {\n    var numb = 2;\n  }\n\n  console.log(numb);\n}\n\nrun();",
+      "hasOptions": true,
+      "options": [
+        { "id": 1, "text": "undefined", "isCorrect": false },
+        { "id": 2, "text": "1", "isCorrect": false },
+        { "id": 3, "text": "2", "isCorrect": true },
+        { "id": 4, "text": "null", "isCorrect": false }
+      ]
+    },
+    {
+      "id": 96,
+      "text": "Яка буде вірна відповідь?\n\nlet x = 1;\n\nfunction foo() {\n  console.log(x);\n  let x = 2;\n}\n\n  foo();\n",
+      "hasOptions": true,
+      "options": [
+        { "id": 1, "text": "1", "isCorrect": false },
+        { "id": 2, "text": "2", "isCorrect": false },
+        { "id": 3, "text": "undefined", "isCorrect": false },
+        { "id": 4, "text": "ReferenceError", "isCorrect": true }
       ]
     }
   ],

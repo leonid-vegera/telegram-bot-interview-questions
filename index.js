@@ -43,7 +43,7 @@ bot.command('start', async (ctx) => {
 })
 
 bot.command('about', async (ctx) => {
-  await ctx.reply('Ми допоможемо тобі краще розібратись в основних технологіях ВЕБ-розробки')
+  await ctx.reply('Я допоможу тобі краще розібратись в основних технологіях ВЕБ-розробки')
 })
 
 bot.hears(sections, async (ctx) => {
@@ -52,7 +52,7 @@ bot.hears(sections, async (ctx) => {
 
   let inlineKeyboard;
 
-  if (!!question.hasOptions) {
+  if (!!question?.hasOptions) {
     const buttonRows = question.options.map((option) => [
       InlineKeyboard.text(
         option.text,
@@ -66,10 +66,10 @@ bot.hears(sections, async (ctx) => {
     inlineKeyboard = InlineKeyboard.from(buttonRows);
   } else {
     inlineKeyboard = new InlineKeyboard()
-      .text("Дізнатись відповідь", JSON.stringify({type: questionTopic, questionId: question.id}));
+      .text("Дізнатись відповідь", JSON.stringify({type: questionTopic, questionId: question?.id}));
   }
 
-  await ctx.reply(`${question.text}`,
+  await ctx.reply(`${question?.text}`,
     {reply_markup: inlineKeyboard})
 })
 
